@@ -10,6 +10,32 @@ func TestHjtDecoder_Decoder(t *testing.T) {
 		dadaPack []byte
 	}
 	data := "##0367QN=20200814151600001;ST=22;CN=2011;PW=123456;MN=010000A8900016F000169DC0;Flag=7;CP=&&DataTime=20200814151600;LA-td=50.1,LA-Flag=N;a34004-Rtd=207,a34004-Flag=N;a34002-Rtd=295,a34002-Flag=N;a01001-Rtd=12.6,a01001-Flag=N;a01002-Rtd=32,a01002-Flag=N;a01006-Rtd=101.02,a01006-Flag=N;a01007-Rtd=2.1,a01007-Flag=N;a01008-Rtd=120,a01008-Flag=N;a34001-Rtd=217,a34001-Flag=N;&&5CC0\r\n"
+
+	mapKey := make(map[string]string)
+	mapKey["DataTime"] = "50.1"
+	mapKey["LA-td"] = "20200814151600"
+	mapKey["LA-Flag"] = "N"
+
+	mapKey["a34004-Rtd"] = "207"
+	mapKey["a34004-Flag"] = "N"
+	mapKey["a34002-Rtd"] = "295"
+	mapKey["a34002-Flag"] = "N"
+	mapKey["a01001-Rtd"] = "12.6"
+	mapKey["a01001-Flag"] = "N"
+	mapKey["a01002-Rtd"] = "32"
+	mapKey["a01002-Flag"] = "N"
+	mapKey["a01006-Rtd"] = "101.02"
+	mapKey["a01006-Flag"] = "N"
+	mapKey["a01007-Rtd"] = "2.1"
+	mapKey["a01007-Flag"] = "N"
+	mapKey["a01008-Rtd"] = "120"
+	mapKey["a01008-Flag"] = "N"
+	mapKey["a34001-Rtd"] = "217"
+	mapKey["a34001-Flag"] = "N"
+
+	cpMap := make(map[int]map[string]string)
+	cpMap[1] = mapKey
+
 	tests := []struct {
 		name    string
 		args    args
@@ -30,7 +56,7 @@ func TestHjtDecoder_Decoder(t *testing.T) {
 				MN:      []byte("010000A8900016F000169DC0"),
 				Flag:    7,
 				PNum:    1,
-				Package: map[int]map[string]string{1: {"DataTime": "20200814151600"}},
+				Package: cpMap,
 			},
 			wantErr: false,
 		},
