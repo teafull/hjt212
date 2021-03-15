@@ -16,7 +16,7 @@ func (h *HjtEncoder) Encoder(hjt212Cmd Hjt212Cmd) ([]byte, error) {
 		return nil, errors.New("hjt212 data package check failed")
 	}
 
-	hjt212Byte := make([]byte, 4096)
+	hjt212Byte := make([]byte, 2048)
 	hjt212Buf := bytes.NewBuffer(hjt212Byte)
 	hjt212Buf.WriteString(Head) // package of head
 
