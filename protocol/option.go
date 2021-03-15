@@ -49,9 +49,19 @@ type Hjt212Package struct {
 	Package map[int]map[string]string //  data pack，format is <PNo, <dataKey, dataValue>>, there is only one packet by default.
 }
 
+type Hjt212Cmd struct {
+	QN     []byte            // 请求编号, ms级时间戳
+	ST     int               // 系统编号
+	CN     int               // 命令编号
+	MN     []byte            // 设备唯一标识
+	PW     []byte            // 密码
+	Flag   int               // Flag标志
+	Params map[string]string // cmd pack，format is <paramKey, paramValue>
+}
+
 // Hjt212Encoder related interfaces for performing coding
 type Hjt212Encoder interface {
-	Encoder(hjt212Package Hjt212Package) ([]byte, error)
+	Encoder(hjt212Cmd Hjt212Cmd) ([]byte, error)
 }
 
 // Hjt212Decoder perform decoding related interfaces
