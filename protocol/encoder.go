@@ -42,7 +42,7 @@ func (h *HjtEncoder) checkHjt212Package(hjt212Cmd Hjt212Cmd) bool {
 
 // make data cmd package
 func (h *HjtEncoder) makeCmdDataPkg(hjt212Cmd Hjt212Cmd) []byte {
-	cmdDataPkgByte := make([]byte, 4096)
+	cmdDataPkgByte := make([]byte, 1024)
 	cmdDataPkgBuf := bytes.NewBuffer(cmdDataPkgByte)
 
 	cmdDataPkgBuf.WriteString("QN=")
@@ -53,7 +53,7 @@ func (h *HjtEncoder) makeCmdDataPkg(hjt212Cmd Hjt212Cmd) []byte {
 
 // make cp data
 func (h *HjtEncoder) makeCmdCp(params map[string]string) []byte {
-	cmdCpByte := make([]byte, 4096)
+	cmdCpByte := make([]byte, 512)
 	cmdCpBuf := bytes.NewBuffer(cmdCpByte)
 
 	cmdCpBuf.WriteString("CP=&&")
