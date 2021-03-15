@@ -1,4 +1,4 @@
-// 解析环境因子数据到内存
+// parse environmental factor data to memory
 package protocol
 
 import (
