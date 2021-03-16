@@ -4,6 +4,8 @@ package protocol
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"strconv"
 )
 
 type HjtEncoder struct {
@@ -16,15 +18,19 @@ func (h *HjtEncoder) Encoder(hjt212Cmd Hjt212Cmd) ([]byte, error) {
 		return nil, errors.New("hjt212 data package check failed")
 	}
 
-	hjt212Byte := make([]byte, 2048)
-	hjt212Buf := bytes.NewBuffer(hjt212Byte)
+	hjt212Buf := bytes.NewBuffer(nil)
 	hjt212Buf.WriteString(Head) // package of head
 
 	// data pack
+	dataPkg := h.makeCmdDataPkg(hjt212Cmd)
+	hjt212Buf.WriteString(fmt.Sprintf("%04d", len(dataPkg))) // data package length
+	hjt212Buf.Write(dataPkg)
+	crcResult, _ := CalCrc(dataPkg)
+	hjt212Buf.WriteString(fmt.Sprintf("%04X", crcResult)) // data package crc
 
 	hjt212Buf.WriteString(Tail) // package of tail
 
-	return hjt212Byte, nil
+	return hjt212Buf.Bytes(), nil
 }
 
 // check data
@@ -42,23 +48,45 @@ func (h *HjtEncoder) checkHjt212Package(hjt212Cmd Hjt212Cmd) bool {
 
 // make data cmd package
 func (h *HjtEncoder) makeCmdDataPkg(hjt212Cmd Hjt212Cmd) []byte {
-	cmdDataPkgByte := make([]byte, 1024)
-	cmdDataPkgBuf := bytes.NewBuffer(cmdDataPkgByte)
+	cmdDataPkgBuf := bytes.NewBuffer(nil)
 
-	cmdDataPkgBuf.WriteString("QN=")
 	// TODO make hjt212Cmd to cmdDataPkgBuf
+	cmdDataPkgBuf.WriteString("QN=")
+	cmdDataPkgBuf.Write(hjt212Cmd.QN)
+	cmdDataPkgBuf.WriteString(";ST=")
+	cmdDataPkgBuf.WriteString(strconv.Itoa(hjt212Cmd.ST))
+	cmdDataPkgBuf.WriteString(";CN=")
+	cmdDataPkgBuf.WriteString(strconv.Itoa(hjt212Cmd.CN))
+	cmdDataPkgBuf.WriteString(";PW=")
+	cmdDataPkgBuf.Write(hjt212Cmd.PW)
+	cmdDataPkgBuf.WriteString(";MN=")
+	cmdDataPkgBuf.Write(hjt212Cmd.MN)
+	cmdDataPkgBuf.WriteString(";Flag=")
+	cmdDataPkgBuf.WriteString(strconv.Itoa(hjt212Cmd.Flag))
+	cmdDataPkgBuf.WriteString(";")
+	cmdDataPkgBuf.Write(h.makeCmdCp(hjt212Cmd.Params))
 
-	return cmdDataPkgByte
+	return cmdDataPkgBuf.Bytes()
 }
 
 // make cp data
 func (h *HjtEncoder) makeCmdCp(params map[string]string) []byte {
-	cmdCpByte := make([]byte, 512)
-	cmdCpBuf := bytes.NewBuffer(cmdCpByte)
+	cpBuf := bytes.NewBuffer(nil)
 
-	cmdCpBuf.WriteString("CP=&&")
 	// TODO make params to cmdCpBuf
-	cmdCpBuf.WriteString("&&")
+	i := 0
+	cpBuf.WriteString("CP=&&")
+	for pKey, pValue := range params {
+		if len(params) > 1 && i != 0 {
+			cpBuf.WriteString(",")
+		}
+		i++
 
-	return cmdCpByte
+		cpBuf.WriteString(pKey)
+		cpBuf.WriteString("=")
+		cpBuf.WriteString(pValue)
+	}
+	cpBuf.WriteString("&&")
+
+	return cpBuf.Bytes()
 }

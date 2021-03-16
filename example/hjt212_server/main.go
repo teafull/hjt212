@@ -7,4 +7,6 @@ import (
 
 func main() {
 	fmt.Println("this is hjt212 test server")
+	str := fmt.Sprintf("%04d", 125)
+	fmt.Println(str)
 }
