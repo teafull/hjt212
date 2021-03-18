@@ -3,10 +3,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/teafull/hjt212/utils"
 )
 
 func main() {
 	fmt.Println("this is hjt212 test server")
-	str := fmt.Sprintf("%04d", 125)
-	fmt.Println(str)
+
+	fmt.Println(string(utils.GetQN()))
 }

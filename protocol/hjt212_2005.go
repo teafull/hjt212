@@ -1,6 +1,8 @@
 // 2005标准协议内容
 package protocol
 
+import "github.com/teafull/hjt212/utils"
+
 // ST 系统编码表(可扩充) (GB/T16706-1996)见《环境信息标准化手册》第一卷第 236 页
 const (
 	SurfaceWaterMonitoring                         = 21 // 地表水监测
@@ -170,3 +172,22 @@ var (
 		"101:总磷:污水",
 	}
 )
+
+// 编写一些常用的2005协议中的函数，对外提供常用控制方法
+
+//1.设置现场机访问密码
+func makeSetPw(MN, oldPW, NewPw string, ST int) []byte {
+	hjt212Cmd := Hjt212Cmd{
+		QN:     utils.GetQN(),
+		ST:     ST,
+		CN:     SetAccessPassword,
+		MN:     []byte(MN),
+		PW:     []byte(oldPW),
+		Flag:   3,
+		Params: map[string]string{"PW": NewPw},
+	}
+
+	h := &HjtEncoder{}
+	pwCmd, _ := h.Encoder(hjt212Cmd)
+	return pwCmd
+}
