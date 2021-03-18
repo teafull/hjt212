@@ -134,3 +134,21 @@ func TestHjtEncoder_Encoder(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkHjtEncoder_Encoder(b *testing.B) {
+
+	hjt212Cmd := Hjt212Cmd{
+		QN:     []byte("20040516010101001"),
+		ST:     32,
+		CN:     2051,
+		MN:     []byte("88888880000001"),
+		PW:     []byte("123456"),
+		Flag:   3,
+		Params: map[string]string{"BeginTime": "20040506111000", "EndTime": "20040506151000"},
+	}
+
+	h := &HjtEncoder{}
+	for i := 0; i < b.N; i++ {
+		h.Encoder(hjt212Cmd)
+	}
+}

@@ -67,3 +67,11 @@ func TestVerifyCrc(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkCalCrc(b *testing.B) {
+	hjt212data := "QN=20160801085857223;ST=32;CN=1062;PW=100000;MN=010000A8900016F000169DC0;Flag=5;CP=&&RtdInterval=30&&"
+
+	for i := 0; i < b.N; i++ {
+		CalCrc([]byte(hjt212data))
+	}
+}
