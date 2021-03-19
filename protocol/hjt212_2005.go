@@ -1,7 +1,11 @@
 // 2005标准协议内容
 package protocol
 
-import "github.com/teafull/hjt212/utils"
+import (
+	"github.com/teafull/hjt212/utils"
+	"io"
+	"strconv"
+)
 
 // ST 系统编码表(可扩充) (GB/T16706-1996)见《环境信息标准化手册》第一卷第 236 页
 const (
@@ -190,4 +194,41 @@ func makeSetPw(MN, oldPW, NewPw string, ST int) []byte {
 	h := &HjtEncoder{}
 	pwCmd, _ := h.Encoder(hjt212Cmd)
 	return pwCmd
+}
+
+func SetPW(MN, oldPW, NewPw string, ST int, dest io.ReadWriteCloser) {
+	// step one
+	req := makeSetPw(MN, oldPW, NewPw, ST)
+	dest.Write(req) // 上位机 发送设置现场机访问密码
+
+	// step two, 请求应答
+	reqRsp := make([]byte, 256)
+	rspLen, err := dest.Read(reqRsp)
+	if rspLen < 0 || err != nil {
+		return
+	}
+
+	// 解析请求应答 ST=91;CN=9011;PW=123456;MN=88888880000001;Flag=0;CP=&&QN=20040516010101001;QnRtn=1&&
+	h := &HjtDecoder{}
+	hjt212Package, err := h.Decoder(reqRsp)
+	if err != nil || hjt212Package.ST != ST || string(hjt212Package.MN) != MN || hjt212Package.CN != RequestResponse {
+		return
+	}
+	if len(hjt212Package.Package) > 0 {
+		QnRtn, ok := hjt212Package.Package[0]["QnRtn"]
+		if QnRtnI, _ := strconv.Atoi(QnRtn); QnRtnI != 1 || !ok {
+			return
+		}
+	} else {
+		return
+	}
+
+	// step three, 返回操作执行结果
+	reqRsp = make([]byte, 256)
+	rspLen, err = dest.Read(reqRsp)
+	if rspLen < 0 || err != nil {
+		return
+	}
+
+	// 解析操作执行结果
 }
